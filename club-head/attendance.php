@@ -95,6 +95,7 @@ if ($selectedEventId > 0) {
             <li><a href="club.php">🏛️ Club Details</a></li>
             <li><a href="members.php">👥 Members List</a></li>
             <li><a href="events.php">📅 Club Events</a></li>
+            <li><a href="calendar.php">🗓️ Calendar View</a></li>
             <li><a href="registrations.php">📝 Event Registrations</a></li>
             <li><a href="attendance.php" class="active">✓ Mark Attendance</a></li>
             <li><a href="announcements.php">📢 Announcements</a></li>
