@@ -87,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li><a href="responsibilities.php">🎖️ Responsibilities</a></li>
             <li><a href="memberships.php">🤝 Memberships</a></li>
             <li><a href="events.php">📅 Events Directory</a></li>
+            <li><a href="calendar.php">🗓️ Calendar View</a></li>
             <li><a href="registrations.php">📝 Event Registrants</a></li>
             <li><a href="attendance.php">✓ Attendance Logs</a></li>
             <li><a href="announcements.php">📢 Announcements</a></li>
