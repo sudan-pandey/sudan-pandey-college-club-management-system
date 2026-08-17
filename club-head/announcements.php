@@ -28,17 +28,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'create') {
             $title = trim($_POST['title'] ?? '');
+            $priority = trim($_POST['priority'] ?? 'General');
             $content = trim($_POST['content'] ?? '');
 
             if (empty($title) || empty($content)) {
                 $error = "Title and content cannot be blank.";
             } else {
                 try {
-                    $ins = $pdo->prepare("INSERT INTO announcements (club_id, title, content, created_by) VALUES (?, ?, ?, ?)");
-                    $ins->execute([$clubId, $title, $content, $userId]);
+                    $ins = $pdo->prepare("INSERT INTO announcements (club_id, title, priority, content, created_by) VALUES (?, ?, ?, ?, ?)");
+                    $ins->execute([$clubId, $title, $priority, $content, $userId]);
                     $success = "Announcement published successfully!";
                 } catch (PDOException $e) {
-                    $error = "Database Error: " . $e->getMessage();
+                    try {
+                        $ins = $pdo->prepare("INSERT INTO announcements (club_id, title, content, created_by) VALUES (?, ?, ?, ?)");
+                        $ins->execute([$clubId, $title, $content, $userId]);
+                        $success = "Announcement published successfully!";
+                    } catch (PDOException $ex) {
+                        $error = "Database Error: " . $ex->getMessage();
+                    }
                 }
             }
         } elseif ($action === 'delete') {
@@ -59,13 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch centralized announcements from ALL clubs
+// Fetch centralized announcements from ALL clubs and system admin
 try {
-    $stmt = $pdo->query("SELECT a.*, c.name AS club_name, u.full_name AS publisher
-                           FROM announcements a
-                           JOIN clubs c ON a.club_id = c.id
-                           JOIN users u ON a.created_by = u.id
-                           ORDER BY a.created_at DESC");
+    $stmt = $pdo->query("SELECT a.*,
+                                COALESCE(c.name, 'System Admin') AS sender_name,
+                                u.full_name AS publisher
+                         FROM announcements a
+                         LEFT JOIN clubs c ON a.club_id = c.id
+                         LEFT JOIN users u ON a.created_by = u.id
+                         ORDER BY a.created_at DESC");
     $announcements = $stmt->fetchAll();
 } catch (PDOException $e) {
     die("Database Error: " . htmlspecialchars($e->getMessage()));
@@ -114,6 +123,15 @@ try {
                 </div>
 
                 <div class="form-group">
+                    <label for="priority">Priority / Notice Tag</label>
+                    <select id="priority" name="priority" class="form-control">
+                        <option value="General">General</option>
+                        <option value="Urgent">Urgent</option>
+                        <option value="Event">Event</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="content">Detailed Content</label>
                     <textarea id="content" name="content" class="form-control" rows="4" placeholder="Enter full announcement message..." required></textarea>
                 </div>
@@ -127,31 +145,49 @@ try {
             <?php if (empty($announcements)): ?>
                 <p class="text-muted" style="font-style: italic;">No announcements published yet.</p>
             <?php else: ?>
-                <?php foreach ($announcements as $ann): ?>
-                    <div class="feature-card" style="margin-bottom: 20px; background-color: rgba(15, 23, 42, 0.4);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-                            <span class="status-badge" style="background-color: var(--primary, #2c3e50); color: #fff; padding: 4px 10px; font-weight: 600;">
-                                🏛️ <?php echo escape($ann['club_name']); ?>
-                            </span>
-                            <span class="text-muted" style="font-size: 0.85rem;">🕒 <?php echo escape($ann['created_at']); ?></span>
-                        </div>
-                        <h4 style="margin-bottom: 10px; color: var(--primary, #2c3e50);"><?php echo escape($ann['title']); ?></h4>
-                        <p style="color: var(--text-main); margin-bottom: 15px; line-height: 1.6;"><?php echo nl2br(escape($ann['content'])); ?></p>
+                <div class="card-grid" style="grid-template-columns: 1fr; gap: 20px;">
+                    <?php foreach ($announcements as $ann): ?>
+                        <?php
+                            $priority = !empty($ann['priority']) ? $ann['priority'] : 'General';
+                            $badgeColor = 'var(--primary-color)';
+                            if ($priority === 'Urgent') {
+                                $badgeColor = 'var(--danger)';
+                            } elseif ($priority === 'Event') {
+                                $badgeColor = 'var(--info)';
+                            }
+                            $sender = !empty($ann['sender_name']) ? $ann['sender_name'] : 'System Admin';
+                        ?>
+                        <div class="feature-card" style="border-left: 4px solid <?php echo $badgeColor; ?>;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="status-badge" style="background-color: var(--border-color); color: var(--text-main); padding: 4px 10px; font-weight: 600;">
+                                        🏛️ <?php echo escape($sender); ?>
+                                    </span>
+                                    <span class="status-badge" style="background-color: <?php echo $badgeColor; ?>; color: #fff; padding: 4px 10px; font-weight: 600;">
+                                        📌 <?php echo escape($priority); ?>
+                                    </span>
+                                </div>
+                                <span class="text-muted" style="font-size: 0.85rem;">🕒 <?php echo escape($ann['created_at']); ?></span>
+                            </div>
 
-                        <div style="border-top: 1px dashed var(--border-color); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span class="text-muted" style="font-size: 0.85rem;">Published By: <strong><?php echo escape($ann['publisher']); ?></strong></span>
+                            <h4 style="margin-bottom: 10px; color: var(--text-main); font-size: 1.25rem;"><?php echo escape($ann['title']); ?></h4>
+                            <p style="color: var(--text-main); margin-bottom: 15px; line-height: 1.6; white-space: pre-wrap;"><?php echo escape($ann['content']); ?></p>
 
-                            <?php if (intval($ann['club_id']) === intval($clubId)): ?>
-                                <form action="announcements.php" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
-                                    <?php csrfInput(); ?>
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="announcement_id" value="<?php echo $ann['id']; ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">Delete</button>
-                                </form>
-                            <?php endif; ?>
+                            <div style="border-top: 1px dashed var(--border-color); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                <span class="text-muted" style="font-size: 0.85rem;">Posted by: <strong><?php echo escape($ann['publisher'] ?: 'System Admin'); ?></strong></span>
+
+                                <?php if (intval($ann['club_id']) === intval($clubId)): ?>
+                                    <form action="announcements.php" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
+                                        <?php csrfInput(); ?>
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="announcement_id" value="<?php echo $ann['id']; ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </div>
     </main>

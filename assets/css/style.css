@@ -68,6 +68,75 @@ nav a:hover, nav a.active {
     color: var(--text-main);
 }
 
+/* Top-Right Profile Block */
+.header-profile-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(30, 41, 59, 0.7);
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: 30px;
+    transition: var(--transition);
+}
+
+.header-profile-block:hover {
+    border-color: var(--primary-color);
+}
+
+.user-text-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    line-height: 1.25;
+}
+
+.profile-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.profile-role {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #818cf8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-avatar-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    background-color: var(--bg-dark);
+}
+
+.header-logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: 50%;
+    transition: var(--transition);
+    text-decoration: none;
+    margin-left: 2px;
+}
+
+.header-logout-btn:hover {
+    color: var(--danger);
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
 /* Buttons */
 .btn {
     display: inline-block;

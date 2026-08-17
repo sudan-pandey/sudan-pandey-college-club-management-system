@@ -106,8 +106,9 @@ CREATE TABLE `attendance` (
 -- 8. Announcements Table
 CREATE TABLE `announcements` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `club_id` INT NOT NULL,
+  `club_id` INT DEFAULT NULL,
   `title` VARCHAR(150) NOT NULL,
+  `priority` ENUM('General', 'Urgent', 'Event') NOT NULL DEFAULT 'General',
   `content` TEXT NOT NULL,
   `created_by` INT NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
