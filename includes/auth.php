@@ -6,13 +6,57 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /**
+ * Refreshes user data (full_name, email, role, status) from the database
+ * on every request so role changes take effect immediately on page refresh.
+ *
+ * @param PDO|null $pdo
+ * @return string Current user role
+ */
+function refreshSessionUserData($pdo = null) {
+    if (!isset($_SESSION['user_id'])) {
+        return '';
+    }
+
+    if (!$pdo) {
+        global $pdo;
+    }
+
+    if (!$pdo) {
+        return $_SESSION['user_role'] ?? '';
+    }
+
+    try {
+        $stmt = $pdo->prepare("SELECT full_name, email, role, status FROM users WHERE id = ? LIMIT 1");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch();
+
+        if (!$user || $user['status'] !== 'active') {
+            session_unset();
+            session_destroy();
+            header("Location: ../login.php?error=" . urlencode("Your account is inactive or no longer exists."));
+            exit;
+        }
+
+        $_SESSION['user_name'] = $user['full_name'];
+        $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_role'] = $user['role'];
+
+        return $user['role'];
+    } catch (Exception $e) {
+        return $_SESSION['user_role'] ?? '';
+    }
+}
+
+/**
  * Ensures user is authenticated. Otherwise redirects to login.
  */
 function requireLogin() {
+    global $pdo;
     if (!isset($_SESSION['user_id'])) {
         header("Location: ../login.php");
         exit;
     }
+    refreshSessionUserData($pdo);
 }
 
 /**
@@ -20,26 +64,30 @@ function requireLogin() {
  * @param string|array $allowed_roles
  */
 function requireRole($allowed_roles) {
+    global $pdo;
     requireLogin();
 
-    $user_role = $_SESSION['user_role'] ?? '';
+    $user_role = refreshSessionUserData($pdo);
 
-    // Admins have access everywhere except possibly specific member views
+    $isAllowed = false;
     if ($user_role === 'admin') {
-        return;
+        $isAllowed = true;
+    } elseif (is_array($allowed_roles)) {
+        $isAllowed = in_array($user_role, $allowed_roles);
+    } else {
+        $isAllowed = ($user_role === $allowed_roles);
     }
 
-    if (is_array($allowed_roles)) {
-        if (!in_array($user_role, $allowed_roles)) {
-            // Forbidden access
-            header("Location: ../login.php?error=unauthorized");
-            exit;
+    if (!$isAllowed) {
+        // Redirect seamlessly to the dashboard corresponding to their current role
+        if ($user_role === 'admin') {
+            header("Location: ../admin/dashboard.php");
+        } elseif ($user_role === 'club_head') {
+            header("Location: ../club-head/dashboard.php");
+        } else {
+            header("Location: ../student/dashboard.php");
         }
-    } else {
-        if ($user_role !== $allowed_roles) {
-            header("Location: ../login.php?error=unauthorized");
-            exit;
-        }
+        exit;
     }
 }
 

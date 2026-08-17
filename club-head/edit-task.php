@@ -112,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li><a href="announcements.php">📢 Announcements</a></li>
             <li><a href="feedback.php">⭐ Feedback Reviews</a></li>
             <li><a href="tasks.php" class="active">✅ Task Coordination</a></li>
+            <li><a href="profile.php">👤 Profile Settings</a></li>
         </ul>
     </aside>
 

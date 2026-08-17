@@ -94,3 +94,12 @@ All notable changes to the College Club Management System project will be docume
 - **Club Profile & Image Upload**: Updated `club-head/club.php` to allow Club Heads to edit club description and upload profile image/logo (with 5MB file limit, MIME type & extension checks, and safe unique filename generation).
 - **Centralized Announcements Board**: Updated `student/announcements.php` and `club-head/announcements.php` to display announcements from ALL clubs centrally with club name badges.
 - **Responsive UI Media Queries**: Updated `assets/css/style.css` with responsive layout rules for mobile and tablet viewports (320px, 375px, 425px, 768px, 1024px, 1366px+).
+
+## [2.1.0] - Role Profile Settings & Dynamic Role Sync
+
+### Added
+- **Admin & Club Head Profile Settings**: Created `admin/profile.php` and `club-head/profile.php` allowing Admin and Club Head users to edit full name, email, and password securely with CSRF verification and session updates.
+- **Sidebar & Navbar Navigation Updates**: Updated sidebars across all `admin/` and `club-head/` pages to include "Profile Settings". Updated `includes/navbar.php` header profile block to link directly to role-specific profile settings pages.
+- **Admin Club Logo Management**: Added club profile logo image uploading and preview in `admin/create-club.php` and `admin/edit-club.php`.
+- **Club Profile Image Display**: Displayed club profile logo thumbnails across `admin/clubs.php`, `student/clubs.php`, and `student/my-club.php`.
+- **Real-Time Role Synchronization**: Updated `includes/auth.php` with `refreshSessionUserData()` to sync user role, status, name, and email from database on every page refresh without requiring logout/login. Automatically redirects users if their role is modified by Admin.

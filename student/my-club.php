@@ -105,7 +105,19 @@ try {
         <?php endif; ?>
 
         <div class="feature-card" style="margin-bottom: 30px;">
-            <h3>Club Details</h3>
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
+                <?php if (!empty($clubInfo['logo']) && file_exists('../uploads/clubs/' . $clubInfo['logo'])): ?>
+                    <img src="../uploads/clubs/<?php echo escape($clubInfo['logo']); ?>" alt="<?php echo escape($clubInfo['name']); ?> Logo" style="width: 70px; height: 70px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border-color);">
+                <?php else: ?>
+                    <div style="width: 70px; height: 70px; border-radius: 12px; background: var(--primary, #2c3e50); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold;">
+                        <?php echo strtoupper(substr($clubInfo['name'], 0, 1)); ?>
+                    </div>
+                <?php endif; ?>
+                <div>
+                    <h3 style="margin: 0;"><?php echo escape($clubInfo['name']); ?></h3>
+                    <p class="text-muted" style="margin-top: 5px; font-size: 0.9rem;">Official Club Profile</p>
+                </div>
+            </div>
             <p><?php echo escape($clubInfo['description']); ?></p>
             <div style="margin-top: 15px; font-size: 0.95rem;">
                 <span class="text-muted">Club Head:</span>

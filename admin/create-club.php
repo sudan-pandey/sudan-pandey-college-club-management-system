@@ -19,20 +19,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($name)) {
             $error = "Club name cannot be blank.";
         } else {
-            try {
-                // Check uniqueness on name
-                $stmt = $pdo->prepare("SELECT id FROM clubs WHERE name = ? LIMIT 1");
-                $stmt->execute([$name]);
-                if ($stmt->fetch()) {
-                    $error = "A club with this name already exists.";
+            $logoFilename = null;
+
+            // Handle file upload if provided
+            if (isset($_FILES['club_logo']) && $_FILES['club_logo']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $file = $_FILES['club_logo'];
+
+                if ($file['error'] !== UPLOAD_ERR_OK) {
+                    $error = "File upload failed with error code " . $file['error'];
+                } elseif ($file['size'] > 5 * 1024 * 1024) {
+                    $error = "File size exceeds maximum allowed limit of 5 MB.";
                 } else {
-                    $insertStmt = $pdo->prepare("INSERT INTO clubs (name, description) VALUES (?, ?)");
-                    $insertStmt->execute([$name, $description]);
-                    header("Location: clubs.php?success=" . urlencode("Club created successfully!"));
-                    exit;
+                    $origName = $file['name'];
+                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                    $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mimeType = finfo_file($finfo, $file['tmp_name']);
+                    finfo_close($finfo);
+                    $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+
+                    if (!in_array($ext, $allowedExts) || !in_array($mimeType, $allowedMimes)) {
+                        $error = "Invalid file type. Only JPG, JPEG, PNG, and WEBP images are allowed.";
+                    } else {
+                        $uploadDir = '../uploads/clubs/';
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0755, true);
+                        }
+
+                        $newFilename = 'club_' . bin2hex(random_bytes(8)) . '.' . $ext;
+                        $targetPath = $uploadDir . $newFilename;
+
+                        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                            $logoFilename = $newFilename;
+                        } else {
+                            $error = "Failed to save uploaded image to destination folder.";
+                        }
+                    }
                 }
-            } catch (PDOException $e) {
-                $error = "Database Error: " . $e->getMessage();
+            }
+
+            if (empty($error)) {
+                try {
+                    // Check uniqueness on name
+                    $stmt = $pdo->prepare("SELECT id FROM clubs WHERE name = ? LIMIT 1");
+                    $stmt->execute([$name]);
+                    if ($stmt->fetch()) {
+                        $error = "A club with this name already exists.";
+                    } else {
+                        $insertStmt = $pdo->prepare("INSERT INTO clubs (name, description, logo) VALUES (?, ?, ?)");
+                        $insertStmt->execute([$name, $description, $logoFilename]);
+                        header("Location: clubs.php?success=" . urlencode("Club created successfully!"));
+                        exit;
+                    }
+                } catch (PDOException $e) {
+                    $error = "Database Error: " . $e->getMessage();
+                }
             }
         }
     }
@@ -56,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li><a href="announcements.php">📢 Announcements</a></li>
             <li><a href="feedback.php">⭐ Feedback & Ratings</a></li>
             <li><a href="tasks.php">✅ Task Assignments</a></li>
+            <li><a href="profile.php">👤 Profile Settings</a></li>
         </ul>
     </aside>
 
@@ -67,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="alert alert-danger"><?php echo escape($error); ?></div>
         <?php endif; ?>
 
-        <form action="create-club.php" method="POST" style="margin-top: 20px;">
+        <form action="create-club.php" method="POST" enctype="multipart/form-data" style="margin-top: 20px;">
             <?php csrfInput(); ?>
 
             <div class="form-group">
@@ -78,6 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="description">Description</label>
                 <textarea id="description" name="description" class="form-control" rows="5" placeholder="Provide a short synopsis of the club goals and activities..."><?php echo isset($_POST['description']) ? escape($_POST['description']) : ''; ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="club_logo">Club Profile Image / Logo (Max 5 MB, JPG/PNG/WEBP)</label>
+                <input type="file" id="club_logo" name="club_logo" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
             </div>
 
             <div style="display: flex; gap: 10px;">

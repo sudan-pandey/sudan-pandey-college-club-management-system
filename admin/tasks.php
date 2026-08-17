@@ -36,6 +36,7 @@ try {
             <li><a href="announcements.php">📢 Announcements</a></li>
             <li><a href="feedback.php">⭐ Feedback & Ratings</a></li>
             <li><a href="tasks.php" class="active">✅ Task Assignments</a></li>
+            <li><a href="profile.php">👤 Profile Settings</a></li>
         </ul>
     </aside>
 

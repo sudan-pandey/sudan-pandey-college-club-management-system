@@ -59,6 +59,7 @@ try {
             <li><a href="announcements.php">📢 Announcements</a></li>
             <li><a href="feedback.php">⭐ Feedback & Ratings</a></li>
             <li><a href="tasks.php">✅ Task Assignments</a></li>
+            <li><a href="profile.php">👤 Profile Settings</a></li>
         </ul>
     </aside>
 
@@ -82,7 +83,16 @@ try {
                 <?php foreach ($clubs as $club): ?>
                     <div class="card">
                         <div>
-                            <h3><?php echo escape($club['name']); ?></h3>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                                <?php if (!empty($club['logo']) && file_exists('../uploads/clubs/' . $club['logo'])): ?>
+                                    <img src="../uploads/clubs/<?php echo escape($club['logo']); ?>" alt="<?php echo escape($club['name']); ?> Logo" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                                <?php else: ?>
+                                    <div style="width: 50px; height: 50px; border-radius: 8px; background: var(--primary, #2c3e50); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; flex-shrink: 0;">
+                                        <?php echo strtoupper(substr($club['name'], 0, 1)); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <h3 style="margin: 0;"><?php echo escape($club['name']); ?></h3>
+                            </div>
                             <p><?php echo escape($club['description']); ?></p>
                             <div style="margin-bottom: 15px; font-size: 0.9rem;">
                                 <span class="text-muted">Club Head:</span>

@@ -82,6 +82,7 @@ try {
                 <li><a href="feedback.php">⭐ Feedback Reviews</a></li>
                 <li><a href="tasks.php">✅ Task Coordination</a></li>
             <?php endif; ?>
+            <li><a href="profile.php">👤 Profile Settings</a></li>
         </ul>
     </aside>
 
