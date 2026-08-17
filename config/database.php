@@ -19,6 +19,9 @@ try {
     );
 } catch (PDOException $e) {
     // Elegant but safe connection error response
+    if (php_sapi_name() === 'cli') {
+        throw new Exception("Database Connection Failed: " . $e->getMessage());
+    }
     die("Database Connection Failed: " . htmlspecialchars($e->getMessage()));
 }
 ?>
