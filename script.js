@@ -1,10 +1,10 @@
 /**
  * ClubManager Events Dashboard JavaScript
- * Handles accessible modal controls, focus trapping, ESC key listener, and backdrop clicks.
+ * Implements accessible modal toggles, focus trapping, ESC key listeners, and backdrop click handlers.
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    // DOM Elements
+    // DOM Selectors
     const modalOverlay = document.getElementById('eventModalOverlay');
     const modalContent = modalOverlay ? modalOverlay.querySelector('.modal-content') : null;
     const modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -16,8 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let previousActiveElement = null;
 
     /**
-     * Open Modal Handler
-     * @param {Event} event
+     * Opens the Create Event modal and sets focus
      */
     function openModal(event) {
         if (event) {
@@ -29,10 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
             modalOverlay.classList.add('active');
             modalOverlay.setAttribute('aria-hidden', 'false');
 
-            // Lock body scroll when modal is open
+            // Lock background scrolling
             document.body.style.overflow = 'hidden';
 
-            // Focus on first input in modal after CSS transition
+            // Set focus to the first input field
             setTimeout(function () {
                 if (eventTitleInput) {
                     eventTitleInput.focus();
@@ -44,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /**
-     * Close Modal Handler
+     * Closes the Create Event modal and restores focus
      */
     function closeModal() {
         if (modalOverlay && modalOverlay.classList.contains('active')) {
@@ -54,19 +53,19 @@ document.addEventListener('DOMContentLoaded', function () {
             // Restore body scroll
             document.body.style.overflow = '';
 
-            // Restore focus to element that opened the modal
+            // Return focus to trigger element
             if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
                 previousActiveElement.focus();
             }
         }
     }
 
-    // Attach open modal listeners to all trigger buttons
+    // Attach click listeners to all open modal trigger buttons
     openModalBtns.forEach(function (btn) {
         btn.addEventListener('click', openModal);
     });
 
-    // Close modal via close (×) button and Cancel button
+    // Close buttons
     if (modalCloseBtn) {
         modalCloseBtn.addEventListener('click', closeModal);
     }
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalCancelBtn.addEventListener('click', closeModal);
     }
 
-    // Close modal when clicking outside on the backdrop overlay
+    // Close on backdrop overlay click
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function (e) {
             if (e.target === modalOverlay) {
@@ -83,19 +82,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Keyboard Navigation: Close on ESC key and trap focus within modal
+    // Keyboard Navigation: Escape key close & Tab focus trap
     document.addEventListener('keydown', function (e) {
         if (!modalOverlay || !modalOverlay.classList.contains('active')) {
             return;
         }
 
-        // Close on ESC
+        // Escape Key
         if (e.key === 'Escape' || e.key === 'Esc') {
             closeModal();
             return;
         }
 
-        // Focus Trap Inside Modal
+        // Tab Focus Trapping
         if (e.key === 'Tab') {
             const focusableElements = modalOverlay.querySelectorAll(
                 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -127,15 +126,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const title = document.getElementById('eventTitle') ? document.getElementById('eventTitle').value : '';
             const dateTime = document.getElementById('eventDateTime') ? document.getElementById('eventDateTime').value : '';
-            const location = document.getElementById('eventLocation') ? document.getElementById('eventLocation').value : '';
             const description = document.getElementById('eventDescription') ? document.getElementById('eventDescription').value : '';
 
             if (!title || !dateTime || !description) {
-                alert('Please fill in all required fields.');
+                alert('Please complete all required fields.');
                 return;
             }
 
-            // Simple demo handling - close modal and alert
             closeModal();
             createEventForm.reset();
             alert('Event "' + title + '" created successfully!');

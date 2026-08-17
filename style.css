@@ -1,11 +1,11 @@
-/* CSS Custom Properties & Design System Guidelines */
+/* Modern Dark-Mode Palette & CSS Custom Properties */
 :root {
     --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     --bg-dark: #0f172a;
     --bg-card: #1e293b;
     --bg-card-hover: #26334d;
     --text-main: #f8fafc;
-    --text-muted: #9CA3AF; /* Accessible slate text for dark theme */
+    --text-muted: #9CA3AF; /* Muted slate for accessible dark mode contrast */
     --border-color: #334155;
     --primary-color: #4f46e5;
     --primary-hover: #4338ca;
@@ -30,7 +30,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Container Constraint */
+/* Constrained Container */
 .container {
     width: 100%;
     max-width: 1200px;
@@ -38,7 +38,7 @@ body {
     padding: 0 20px;
 }
 
-/* Header & Navigation Styling */
+/* Top App Header */
 .app-header {
     background-color: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
@@ -122,7 +122,7 @@ body {
     font-size: 0.85rem;
 }
 
-/* Dashboard Layout Split */
+/* Dashboard Split Layout */
 .dashboard-container {
     display: flex;
     gap: 32px;
@@ -182,7 +182,7 @@ body {
     color: #ffffff;
 }
 
-/* Main Dashboard Content Area */
+/* Core Dashboard Content Area */
 .main-content {
     flex-grow: 1;
     min-width: 0;
@@ -208,7 +208,7 @@ body {
     font-size: 0.95rem;
 }
 
-/* Enhanced Empty State Component */
+/* Enhanced Empty State Card Component */
 .empty-state-card {
     background-color: var(--bg-card);
     border: 1px dashed var(--border-color);
@@ -241,19 +241,19 @@ body {
     font-weight: 700;
     color: var(--text-main);
     margin-bottom: 10px;
-    font-style: normal; /* Sans-serif clean look */
+    font-style: normal; /* Sans-serif clean style */
 }
 
 .empty-state-description {
-    color: var(--text-muted); /* #9CA3AF accessible slate color */
+    color: var(--text-muted); /* #9CA3AF slate description */
     font-size: 0.975rem;
     max-width: 440px;
     margin-bottom: 28px;
     line-height: 1.6;
-    font-style: normal; /* Sans-serif clean look */
+    font-style: normal; /* Sans-serif clean style */
 }
 
-/* Buttons */
+/* Primary and Secondary Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -289,7 +289,7 @@ body {
     background-color: #475569;
 }
 
-/* Form Controls */
+/* Form Controls & Labels */
 .form-group {
     margin-bottom: 20px;
 }
@@ -329,7 +329,7 @@ textarea.form-control {
     min-height: 100px;
 }
 
-/* Keyboard focus feedback */
+/* Focus Visible Keyboard Navigation */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -339,7 +339,7 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
-/* Accessible Modal Popup */
+/* Accessible Modal Overlay & Container */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -433,7 +433,7 @@ textarea:focus-visible {
     gap: 24px;
 }
 
-/* Responsive Breakpoints */
+/* Responsive Media Queries */
 @media (max-width: 900px) {
     .dashboard-container {
         flex-direction: column;
