@@ -67,7 +67,12 @@ try {
                 <?php foreach ($clubs as $club): ?>
                     <div class="card">
                         <div>
-                            <h3><?php echo escape($club['name']); ?></h3>
+                            <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
+                                <?php echo renderClubLogo($club['logo'] ?? null, $club['name'], 48); ?>
+                                <div>
+                                    <h3 style="margin-top: 0; margin-bottom: 4px;"><?php echo escape($club['name']); ?></h3>
+                                </div>
+                            </div>
                             <p><?php echo escape($club['description']); ?></p>
                             <div style="margin-bottom: 15px; font-size: 0.9rem;">
                                 <span class="text-muted">Club Head:</span>

@@ -11,6 +11,98 @@ function escape($value) {
 }
 
 /**
+ * Renders HTML for a club logo/image or a clean placeholder.
+ *
+ * @param string|null $logoFilename
+ * @param string $clubName
+ * @param int $size Width and height in pixels (default: 60)
+ * @param string $extraClass Additional CSS classes
+ * @return string HTML string
+ */
+function renderClubLogo($logoFilename, $clubName, $size = 60, $extraClass = '') {
+    $sizeStyle = "width: {$size}px; height: {$size}px;";
+
+    // Check if relative path or absolute path exists for logo file
+    $logoPath = '../uploads/clubs/' . $logoFilename;
+    $rootLogoPath = 'uploads/clubs/' . $logoFilename;
+    $src = null;
+
+    if (!empty($logoFilename)) {
+        if (file_exists($logoPath)) {
+            $src = $logoPath;
+        } elseif (file_exists($rootLogoPath)) {
+            $src = $rootLogoPath;
+        } elseif (file_exists(__DIR__ . '/../uploads/clubs/' . $logoFilename)) {
+            $src = '../uploads/clubs/' . $logoFilename;
+        }
+    }
+
+    if ($src) {
+        return sprintf(
+            '<img src="%s" alt="%s Logo" class="club-logo-img %s" style="%s object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color); flex-shrink: 0;" />',
+            escape($src),
+            escape($clubName),
+            escape($extraClass),
+            $sizeStyle
+        );
+    }
+
+    // Default icon/placeholder SVG or initial letter badge
+    $initial = strtoupper(substr($clubName, 0, 1));
+    $fontSize = max(0.9, round($size * 0.4 / 16, 2)) . 'rem';
+
+    return sprintf(
+        '<div class="club-logo-placeholder %s" style="%s border-radius: 12px; background: var(--border-color, #334155); color: #818cf8; display: inline-flex; align-items: center; justify-content: center; font-size: %s; font-weight: 700; flex-shrink: 0; border: 1px solid var(--border-color);"><svg width="%d" height="%d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.9;"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-3"></path><path d="M9 9l0 .01"></path><path d="M9 12l0 .01"></path></svg></div>',
+        escape($extraClass),
+        $sizeStyle,
+        $fontSize,
+        round($size * 0.5),
+        round($size * 0.5)
+    );
+}
+
+/**
+ * Gets the count of unread announcements for a student user.
+ *
+ * @param PDO $pdo
+ * @param int $userId
+ * @return int
+ */
+function getUnreadAnnouncementsCount($pdo, $userId) {
+    if (!$userId) return 0;
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*)
+                               FROM announcements a
+                               LEFT JOIN announcement_reads ar ON a.id = ar.announcement_id AND ar.user_id = ?
+                               WHERE ar.announcement_id IS NULL");
+        $stmt->execute([$userId]);
+        return intval($stmt->fetchColumn());
+    } catch (PDOException $e) {
+        return 0;
+    }
+}
+
+/**
+ * Gets the count of uncompleted assigned tasks for a student user.
+ *
+ * @param PDO $pdo
+ * @param int $userId
+ * @return int
+ */
+function getPendingTasksCount($pdo, $userId) {
+    if (!$userId) return 0;
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*)
+                               FROM tasks
+                               WHERE assigned_to = ? AND status IN ('pending', 'in_progress')");
+        $stmt->execute([$userId]);
+        return intval($stmt->fetchColumn());
+    } catch (PDOException $e) {
+        return 0;
+    }
+}
+
+/**
  * Renders success/error alerts from GET query parameters
  */
 function displayAlerts() {

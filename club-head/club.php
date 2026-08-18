@@ -134,13 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="feature-card" style="margin-top: 25px;">
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <?php if (!empty($club['logo']) && file_exists('../uploads/clubs/' . $club['logo'])): ?>
-                    <img src="../uploads/clubs/<?php echo escape($club['logo']); ?>" alt="<?php echo escape($club['name']); ?> Logo" style="width: 90px; height: 90px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border-color);">
-                <?php else: ?>
-                    <div style="width: 90px; height: 90px; border-radius: 12px; background: var(--primary, #2c3e50); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: bold;">
-                        <?php echo strtoupper(substr($club['name'], 0, 1)); ?>
-                    </div>
-                <?php endif; ?>
+                <?php echo renderClubLogo($club['logo'] ?? null, $club['name'], 90); ?>
                 <div>
                     <h3 style="margin: 0;"><?php echo escape($club['name']); ?></h3>
                     <p class="text-muted" style="margin-top: 5px; font-size: 0.95rem;">Managed by <?php echo escape($_SESSION['user_name'] ?? 'Club Head'); ?></p>

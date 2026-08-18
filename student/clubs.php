@@ -46,7 +46,15 @@ unset($_SESSION['one_club_modal']);
             <?php foreach ($clubs as $club): ?>
                 <div class="card">
                     <div>
-                        <h3><?php echo escape($club['name']); ?></h3>
+                        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                            <?php echo renderClubLogo($club['logo'] ?? null, $club['name'], 56); ?>
+                            <div>
+                                <h3 style="margin-top: 0; margin-bottom: 4px;"><?php echo escape($club['name']); ?></h3>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                                    Managed by <strong><?php echo $club['head_name'] ? escape($club['head_name']) : 'Unassigned'; ?></strong>
+                                </div>
+                            </div>
+                        </div>
                         <p><?php echo escape($club['description']); ?></p>
                         <div style="font-size: 0.9rem; margin-bottom: 20px;">
                             <div><span class="text-muted">Club Head:</span> <strong><?php echo $club['head_name'] ? escape($club['head_name']) : 'Unassigned'; ?></strong></div>

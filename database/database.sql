@@ -2,6 +2,7 @@
 -- For Tribhuvan University BCA 4th Semester Project
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `announcement_reads`;
 DROP TABLE IF EXISTS `task_comments`;
 DROP TABLE IF EXISTS `tasks`;
 DROP TABLE IF EXISTS `feedback`;
@@ -161,6 +162,16 @@ CREATE TABLE `task_comments` (
   `comment` TEXT NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 12. Announcement Reads Table
+CREATE TABLE `announcement_reads` (
+  `announcement_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `read_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`announcement_id`, `user_id`),
+  FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

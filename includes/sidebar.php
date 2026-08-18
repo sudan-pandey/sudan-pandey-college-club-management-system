@@ -85,9 +85,12 @@ if ($role === 'admin') {
     ];
 
     if (!empty($membership)) {
+        $unreadCount = getUnreadAnnouncementsCount($pdo, $_SESSION['user_id']);
+        $pendingTasksCount = getPendingTasksCount($pdo, $_SESSION['user_id']);
+
         $menuItems[] = ['route' => 'my-club.php', 'label' => 'My Club', 'icon' => 'my-club'];
-        $menuItems[] = ['route' => 'tasks.php', 'label' => 'My Tasks', 'icon' => 'tasks'];
-        $menuItems[] = ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements'];
+        $menuItems[] = ['route' => 'tasks.php', 'label' => 'My Tasks', 'icon' => 'tasks', 'badge' => $pendingTasksCount];
+        $menuItems[] = ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements', 'badge' => $unreadCount];
     }
 
     $menuItems[] = ['route' => 'events.php', 'label' => 'Events', 'icon' => 'events'];
@@ -104,7 +107,10 @@ if ($role === 'admin') {
                 <li>
                     <a href="<?php echo $item['route']; ?>"<?php echo $isActive ? ' class="active" aria-current="page"' : ''; ?>>
                         <?php echo $icons[$item['icon']] ?? ''; ?>
-                        <span><?php echo htmlspecialchars($item['label']); ?></span>
+                        <span style="flex-grow: 1;"><?php echo htmlspecialchars($item['label']); ?></span>
+                        <?php if (!empty($item['badge']) && $item['badge'] > 0): ?>
+                            <span class="sidebar-badge"><?php echo $item['badge']; ?></span>
+                        <?php endif; ?>
                     </a>
                 </li>
             <?php endforeach; ?>
