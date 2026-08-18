@@ -74,6 +74,14 @@ try {
                          LEFT JOIN users u ON a.created_by = u.id
                          ORDER BY a.created_at DESC");
     $announcements = $stmt->fetchAll();
+
+    // Automatically mark all current announcements as read when admin views page
+    if (!empty($announcements) && !empty($userId)) {
+        $markStmt = $pdo->prepare("INSERT IGNORE INTO announcement_reads (announcement_id, user_id) VALUES (?, ?)");
+        foreach ($announcements as $ann) {
+            $markStmt->execute([$ann['id'], $userId]);
+        }
+    }
 } catch (PDOException $e) {
     die("Database Error: " . htmlspecialchars($e->getMessage()));
 }

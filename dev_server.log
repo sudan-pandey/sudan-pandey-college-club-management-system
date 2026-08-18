@@ -1,10 +1,7 @@
-[Thu Aug 13 16:37:40 2026] PHP 8.3.6 Development Server (http://localhost:8080) started
-[Thu Aug 13 16:39:16 2026] [::1]:35550 Accepted
-[Thu Aug 13 16:39:16 2026] [::1]:35550 [200]: HEAD /
-[Thu Aug 13 16:39:16 2026] [::1]:35550 Closing
-[Thu Aug 13 16:42:02 2026] [::1]:34042 Accepted
-[Thu Aug 13 16:42:02 2026] [::1]:34042 [200]: GET /index.php
-[Thu Aug 13 16:42:02 2026] [::1]:34042 Closing
-[Thu Aug 13 16:42:02 2026] [::1]:34044 Accepted
-[Thu Aug 13 16:42:02 2026] [::1]:34044 [200]: GET /assets/css/style.css
-[Thu Aug 13 16:42:02 2026] [::1]:34044 Closing
+[Tue Aug 18 12:17:12 2026] PHP 8.3.6 Development Server (http://localhost:8080) started
+[Tue Aug 18 12:17:25 2026] [::1]:35214 Accepted
+[Tue Aug 18 12:17:25 2026] [::1]:35214 [200]: HEAD /
+[Tue Aug 18 12:17:25 2026] [::1]:35214 Closing
+[Tue Aug 18 12:18:10 2026] [::1]:49530 Accepted
+[Tue Aug 18 12:18:10 2026] [::1]:49530 [200]: GET /login.php
+[Tue Aug 18 12:18:10 2026] [::1]:49530 Closing

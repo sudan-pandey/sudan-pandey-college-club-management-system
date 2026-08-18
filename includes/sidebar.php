@@ -4,7 +4,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+if (!isset($pdo)) {
+    @include_once __DIR__ . '/../config/database.php';
+}
+require_once __DIR__ . '/functions.php';
+
 $role = $_SESSION['user_role'] ?? '';
+$currentUserId = $_SESSION['user_id'] ?? 0;
 $currentPage = $currentPage ?? basename($_SERVER['PHP_SELF']);
 
 // Map subpages/child routes to main parent sidebar navigation item
@@ -47,6 +53,9 @@ $icons = [
 $menuItems = [];
 
 if ($role === 'admin') {
+    $unreadAnnouncements = isset($pdo) ? getUnreadAnnouncementsCount($pdo, $currentUserId) : 0;
+    $pendingTasks = isset($pdo) ? getAllPendingTasksCount($pdo) : 0;
+
     $menuItems = [
         ['route' => 'dashboard.php', 'label' => 'Dashboard', 'icon' => 'dashboard'],
         ['route' => 'users.php', 'label' => 'Users / Roles', 'icon' => 'users'],
@@ -57,11 +66,14 @@ if ($role === 'admin') {
         ['route' => 'calendar.php', 'label' => 'Calendar View', 'icon' => 'calendar'],
         ['route' => 'registrations.php', 'label' => 'Event Registrants', 'icon' => 'registrations'],
         ['route' => 'attendance.php', 'label' => 'Attendance Logs', 'icon' => 'attendance'],
-        ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements'],
+        ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements', 'badge' => $unreadAnnouncements],
         ['route' => 'feedback.php', 'label' => 'Feedback & Ratings', 'icon' => 'feedback'],
-        ['route' => 'tasks.php', 'label' => 'Task Assignments', 'icon' => 'tasks'],
+        ['route' => 'tasks.php', 'label' => 'Task Assignments', 'icon' => 'tasks', 'badge' => $pendingTasks],
     ];
 } elseif ($role === 'club_head') {
+    $unreadAnnouncements = isset($pdo) ? getUnreadAnnouncementsCount($pdo, $currentUserId) : 0;
+    $pendingTasks = isset($pdo) ? getClubHeadPendingTasksCount($pdo, $currentUserId) : 0;
+
     $menuItems = [
         ['route' => 'dashboard.php', 'label' => 'Dashboard', 'icon' => 'dashboard'],
         ['route' => 'club.php', 'label' => 'Club Details', 'icon' => 'clubs'],
@@ -70,14 +82,17 @@ if ($role === 'admin') {
         ['route' => 'calendar.php', 'label' => 'Calendar View', 'icon' => 'calendar'],
         ['route' => 'registrations.php', 'label' => 'Event Registrations', 'icon' => 'registrations'],
         ['route' => 'attendance.php', 'label' => 'Mark Attendance', 'icon' => 'attendance'],
-        ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements'],
+        ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements', 'badge' => $unreadAnnouncements],
         ['route' => 'feedback.php', 'label' => 'Feedback Reviews', 'icon' => 'feedback'],
-        ['route' => 'tasks.php', 'label' => 'Task Coordination', 'icon' => 'tasks'],
+        ['route' => 'tasks.php', 'label' => 'Task Coordination', 'icon' => 'tasks', 'badge' => $pendingTasks],
     ];
 } elseif ($role === 'student') {
-    if (!isset($membership) && isset($pdo) && !empty($_SESSION['user_id'])) {
-        $membership = getActiveMembership($pdo, $_SESSION['user_id']);
+    if (!isset($membership) && isset($pdo) && !empty($currentUserId)) {
+        $membership = getActiveMembership($pdo, $currentUserId);
     }
+
+    $unreadAnnouncements = isset($pdo) ? getUnreadAnnouncementsCount($pdo, $currentUserId) : 0;
+    $pendingTasks = isset($pdo) ? getPendingTasksCount($pdo, $currentUserId) : 0;
 
     $menuItems = [
         ['route' => 'dashboard.php', 'label' => 'Dashboard', 'icon' => 'dashboard'],
@@ -85,14 +100,11 @@ if ($role === 'admin') {
     ];
 
     if (!empty($membership)) {
-        $unreadCount = getUnreadAnnouncementsCount($pdo, $_SESSION['user_id']);
-        $pendingTasksCount = getPendingTasksCount($pdo, $_SESSION['user_id']);
-
         $menuItems[] = ['route' => 'my-club.php', 'label' => 'My Club', 'icon' => 'my-club'];
-        $menuItems[] = ['route' => 'tasks.php', 'label' => 'My Tasks', 'icon' => 'tasks'];
+        $menuItems[] = ['route' => 'tasks.php', 'label' => 'My Tasks', 'icon' => 'tasks', 'badge' => $pendingTasks];
     }
 
-    $menuItems[] = ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements'];
+    $menuItems[] = ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements', 'badge' => $unreadAnnouncements];
     $menuItems[] = ['route' => 'events.php', 'label' => 'Events', 'icon' => 'events'];
     $menuItems[] = ['route' => 'calendar.php', 'label' => 'Calendar View', 'icon' => 'calendar'];
     $menuItems[] = ['route' => 'profile.php', 'label' => 'Profile Settings', 'icon' => 'profile'];
