@@ -55,21 +55,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         $uploadDir = '../uploads/clubs/';
                         if (!is_dir($uploadDir)) {
-                            mkdir($uploadDir, 0755, true);
+                            @mkdir($uploadDir, 0777, true);
+                        }
+                        if (is_dir($uploadDir)) {
+                            @chmod($uploadDir, 0777);
                         }
 
-                        // Generate safe unique filename
-                        $newFilename = 'club_' . $clubId . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-                        $targetPath = $uploadDir . $newFilename;
-
-                        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                            // Delete old logo if exists
-                            if (!empty($club['logo']) && file_exists($uploadDir . $club['logo'])) {
-                                @unlink($uploadDir . $club['logo']);
-                            }
-                            $logoFilename = $newFilename;
+                        if (!is_writable($uploadDir)) {
+                            $error = "Upload directory is not writable. Please check server folder permissions.";
                         } else {
-                            $error = "Failed to save uploaded image to destination folder.";
+                            // Generate safe unique filename
+                            $newFilename = 'club_' . $clubId . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+                            $targetPath = $uploadDir . $newFilename;
+
+                            $saved = move_uploaded_file($file['tmp_name'], $targetPath);
+                            if (!$saved && is_uploaded_file($file['tmp_name'])) {
+                                $saved = copy($file['tmp_name'], $targetPath);
+                            }
+
+                            if ($saved) {
+                                // Delete old logo if exists
+                                if (!empty($club['logo']) && file_exists($uploadDir . $club['logo'])) {
+                                    @unlink($uploadDir . $club['logo']);
+                                }
+                                $logoFilename = $newFilename;
+                            } else {
+                                $error = "Failed to save uploaded image to destination folder. Please verify folder permissions.";
+                            }
                         }
                     }
                 }
