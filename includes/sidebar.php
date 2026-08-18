@@ -89,10 +89,10 @@ if ($role === 'admin') {
         $pendingTasksCount = getPendingTasksCount($pdo, $_SESSION['user_id']);
 
         $menuItems[] = ['route' => 'my-club.php', 'label' => 'My Club', 'icon' => 'my-club'];
-        $menuItems[] = ['route' => 'tasks.php', 'label' => 'My Tasks', 'icon' => 'tasks', 'badge' => $pendingTasksCount];
-        $menuItems[] = ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements', 'badge' => $unreadCount];
+        $menuItems[] = ['route' => 'tasks.php', 'label' => 'My Tasks', 'icon' => 'tasks'];
     }
 
+    $menuItems[] = ['route' => 'announcements.php', 'label' => 'Announcements', 'icon' => 'announcements'];
     $menuItems[] = ['route' => 'events.php', 'label' => 'Events', 'icon' => 'events'];
     $menuItems[] = ['route' => 'calendar.php', 'label' => 'Calendar View', 'icon' => 'calendar'];
     $menuItems[] = ['route' => 'profile.php', 'label' => 'Profile Settings', 'icon' => 'profile'];
