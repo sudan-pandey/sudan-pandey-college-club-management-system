@@ -11,15 +11,26 @@ $userId = $_SESSION['user_id'];
 try {
     $membership = getActiveMembership($pdo, $userId);
 
-    // Centralized Announcements: Fetch announcements from ALL clubs and system admin
-    $stmt = $pdo->query("SELECT a.*,
-                                COALESCE(c.name, 'System Admin') AS sender_name,
-                                u.full_name AS publisher
-                         FROM announcements a
-                         LEFT JOIN clubs c ON a.club_id = c.id
-                         LEFT JOIN users u ON a.created_by = u.id
-                         ORDER BY a.created_at DESC");
+    // Fetch announcements along with read status for current student
+    $stmt = $pdo->prepare("SELECT a.*,
+                                  COALESCE(c.name, 'System Admin') AS sender_name,
+                                  c.logo AS club_logo,
+                                  u.full_name AS publisher,
+                                  (SELECT read_at FROM announcement_reads ar WHERE ar.announcement_id = a.id AND ar.user_id = ? LIMIT 1) AS read_at
+                           FROM announcements a
+                           LEFT JOIN clubs c ON a.club_id = c.id
+                           LEFT JOIN users u ON a.created_by = u.id
+                           ORDER BY a.created_at DESC");
+    $stmt->execute([$userId]);
     $announcements = $stmt->fetchAll();
+
+    // Automatically mark all current announcements as read when student views page
+    if (!empty($announcements)) {
+        $markStmt = $pdo->prepare("INSERT IGNORE INTO announcement_reads (announcement_id, user_id) VALUES (?, ?)");
+        foreach ($announcements as $ann) {
+            $markStmt->execute([$ann['id'], $userId]);
+        }
+    }
 } catch (PDOException $e) {
     die("Database Error: " . htmlspecialchars($e->getMessage()));
 }
@@ -50,15 +61,24 @@ try {
                             }
                             $sender = !empty($ann['sender_name']) ? $ann['sender_name'] : 'System Admin';
                         ?>
-                        <div class="feature-card" style="border-left: 4px solid <?php echo $badgeColor; ?>;">
+                        <?php $isUnread = empty($ann['read_at']); ?>
+                        <div class="feature-card" style="border-left: 4px solid <?php echo $badgeColor; ?>; position: relative;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
+                                    <?php if (!empty($ann['club_id'])): ?>
+                                        <?php echo renderClubLogo($ann['club_logo'] ?? null, $sender, 32); ?>
+                                    <?php endif; ?>
                                     <span class="status-badge" style="background-color: var(--border-color); color: var(--text-main); padding: 4px 10px; font-weight: 600;">
                                         🏛️ <?php echo escape($sender); ?>
                                     </span>
                                     <span class="status-badge" style="background-color: <?php echo $badgeColor; ?>; color: #fff; padding: 4px 10px; font-weight: 600;">
                                         📌 <?php echo escape($priority); ?>
                                     </span>
+                                    <?php if ($isUnread): ?>
+                                        <span class="status-badge" style="background-color: #ef4444; color: #fff; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+                                            NEW
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                                 <span class="text-muted" style="font-size: 0.85rem;">🕒 <?php echo escape($ann['created_at']); ?></span>
                             </div>

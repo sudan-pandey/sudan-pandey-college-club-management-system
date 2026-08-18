@@ -12,7 +12,7 @@ try {
 
     // Fetch all events with status 'upcoming' or 'completed'
     // Also grab registration status for current user
-    $stmt = $pdo->prepare("SELECT e.*, c.name AS club_name,
+    $stmt = $pdo->prepare("SELECT e.*, c.name AS club_name, c.logo AS club_logo,
                              (SELECT COUNT(*) FROM registrations r WHERE r.event_id = e.id) AS reg_count,
                              (SELECT id FROM registrations r WHERE r.event_id = e.id AND r.user_id = ? LIMIT 1) AS user_reg_id,
                              (SELECT status FROM attendance a WHERE a.event_id = e.id AND a.user_id = ? LIMIT 1) AS user_att_status,
@@ -45,7 +45,10 @@ try {
                 <?php foreach ($events as $event): ?>
                     <div class="card">
                         <div>
-                            <span class="badge" style="margin-bottom: 10px;"><?php echo escape($event['club_name']); ?></span>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                <?php echo renderClubLogo($event['club_logo'] ?? null, $event['club_name'], 36); ?>
+                                <span class="badge" style="margin-bottom: 0;"><?php echo escape($event['club_name']); ?></span>
+                            </div>
                             <h3><?php echo escape($event['title']); ?></h3>
                             <p><?php echo escape($event['description']); ?></p>
 
