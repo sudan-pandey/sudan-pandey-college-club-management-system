@@ -104,6 +104,9 @@ To score top marks in a viva defense, this project integrates standard web safet
      ```
 
 ---
+If any file related problem while running locally.
+1.  **sudo chmod -R 775 /opt/lampp/htdocs/project/uploads/clubs**
+2.  **sudo chown -R daemon:daemon /opt/lampp/htdocs/project/uploads/clubs**
 
 ## 🔑 Pre-Seeded Default Test Credentials
 
