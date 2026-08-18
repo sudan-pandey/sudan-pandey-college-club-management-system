@@ -29,22 +29,7 @@ try {
 
 <div class="container dashboard-container">
     <!-- Admin Sidebar Navigation -->
-    <aside class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="dashboard.php" class="active">📊 Dashboard</a></li>
-            <li><a href="users.php">👥 Users / Roles</a></li>
-            <li><a href="clubs.php">🏛️ Clubs</a></li>
-            <li><a href="responsibilities.php">🎖️ Responsibilities</a></li>
-            <li><a href="memberships.php">🤝 Memberships</a></li>
-            <li><a href="events.php">📅 Events Directory</a></li>
-            <li><a href="calendar.php">🗓️ Calendar View</a></li>
-            <li><a href="registrations.php">📝 Event Registrants</a></li>
-            <li><a href="attendance.php">✓ Attendance Logs</a></li>
-            <li><a href="announcements.php">📢 Announcements</a></li>
-            <li><a href="feedback.php">⭐ Feedback & Ratings</a></li>
-            <li><a href="tasks.php">✅ Task Assignments</a></li>
-        </ul>
-    </aside>
+    <?php require_once '../includes/sidebar.php'; ?>
 
     <main class="main-content">
         <div class="flex-header">
