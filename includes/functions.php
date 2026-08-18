@@ -69,7 +69,7 @@ function renderClubLogo($logoFilename, $clubName, $size = 60, $extraClass = '') 
  * @return int
  */
 function getUnreadAnnouncementsCount($pdo, $userId) {
-    if (!$userId) return 0;
+    if (!$userId || !$pdo) return 0;
     try {
         $stmt = $pdo->prepare("SELECT COUNT(*)
                                FROM announcements a
@@ -77,7 +77,44 @@ function getUnreadAnnouncementsCount($pdo, $userId) {
                                WHERE ar.announcement_id IS NULL");
         $stmt->execute([$userId]);
         return intval($stmt->fetchColumn());
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
+        return 0;
+    }
+}
+
+/**
+ * Gets the count of pending/in-progress tasks for a club managed by a club head.
+ *
+ * @param PDO $pdo
+ * @param int $userId
+ * @return int
+ */
+function getClubHeadPendingTasksCount($pdo, $userId) {
+    if (!$userId || !$pdo) return 0;
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(t.id)
+                               FROM tasks t
+                               JOIN clubs c ON t.club_id = c.id
+                               WHERE c.club_head_id = ? AND t.status IN ('pending', 'in_progress')");
+        $stmt->execute([$userId]);
+        return intval($stmt->fetchColumn());
+    } catch (Exception $e) {
+        return 0;
+    }
+}
+
+/**
+ * Gets the count of all pending/in-progress tasks system-wide for admin.
+ *
+ * @param PDO $pdo
+ * @return int
+ */
+function getAllPendingTasksCount($pdo) {
+    if (!$pdo) return 0;
+    try {
+        $stmt = $pdo->query("SELECT COUNT(*) FROM tasks WHERE status IN ('pending', 'in_progress')");
+        return intval($stmt->fetchColumn());
+    } catch (Exception $e) {
         return 0;
     }
 }
@@ -90,14 +127,14 @@ function getUnreadAnnouncementsCount($pdo, $userId) {
  * @return int
  */
 function getPendingTasksCount($pdo, $userId) {
-    if (!$userId) return 0;
+    if (!$userId || !$pdo) return 0;
     try {
         $stmt = $pdo->prepare("SELECT COUNT(*)
                                FROM tasks
                                WHERE assigned_to = ? AND status IN ('pending', 'in_progress')");
         $stmt->execute([$userId]);
         return intval($stmt->fetchColumn());
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         return 0;
     }
 }
