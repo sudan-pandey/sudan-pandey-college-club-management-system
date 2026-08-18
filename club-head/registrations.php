@@ -33,26 +33,17 @@ try {
 <?php require_once '../includes/navbar.php'; ?>
 
 <div class="container dashboard-container">
-    <aside class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="dashboard.php">📊 Dashboard</a></li>
-            <li><a href="club.php">🏛️ Club Details</a></li>
-            <li><a href="members.php">👥 Members List</a></li>
-            <li><a href="events.php">📅 Club Events</a></li>
-            <li><a href="calendar.php">🗓️ Calendar View</a></li>
-            <li><a href="registrations.php" class="active">📝 Event Registrations</a></li>
-            <li><a href="attendance.php">✓ Mark Attendance</a></li>
-            <li><a href="announcements.php">📢 Announcements</a></li>
-            <li><a href="feedback.php">⭐ Feedback Reviews</a></li>
-            <li><a href="tasks.php">✅ Task Coordination</a></li>
-        </ul>
-    </aside>
+    <?php require_once '../includes/sidebar.php'; ?>
 
     <main class="main-content">
-        <h2>Event Registrations</h2>
-        <p class="text-muted">A list of all students signed up for your club's workshops and programs.</p>
+        <div class="flex-header">
+            <div>
+                <h2>Event Registrations</h2>
+                <p class="subtitle">A list of all students signed up for your club's workshops and programs.</p>
+            </div>
+        </div>
 
-        <div class="table-responsive" style="margin-top: 25px;">
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>

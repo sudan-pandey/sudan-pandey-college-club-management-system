@@ -96,18 +96,7 @@ try {
 <?php require_once '../includes/navbar.php'; ?>
 
 <div class="container dashboard-container">
-    <aside class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="dashboard.php">📊 Dashboard</a></li>
-            <li><a href="clubs.php">🏛️ Join Club</a></li>
-            <li><a href="my-club.php">🎖️ My Club</a></li>
-            <li><a href="tasks.php" class="active">✅ My Tasks</a></li>
-            <li><a href="announcements.php">📢 Announcements</a></li>
-            <li><a href="events.php">📅 Events</a></li>
-            <li><a href="calendar.php">🗓️ Calendar View</a></li>
-            <li><a href="profile.php">👤 Profile Settings</a></li>
-        </ul>
-    </aside>
+    <?php require_once '../includes/sidebar.php'; ?>
 
     <main class="main-content">
         <div class="flex-header">
